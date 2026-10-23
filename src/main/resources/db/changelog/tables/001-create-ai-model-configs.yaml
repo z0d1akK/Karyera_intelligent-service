@@ -1,0 +1,68 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 001-create-ai-model-configs
+      author: zodiakk
+
+      changes:
+        - createTable:
+            tableName: ai_model_configs
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(60)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: provider
+                  type: VARCHAR(40)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: model_name
+                  type: VARCHAR(120)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: temperature
+                  type: NUMERIC(3,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: max_output_tokens
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: timeout_seconds
+                  type: INTEGER
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE ai_model_configs ADD CONSTRAINT chk_ai_model_temperature CHECK (temperature >= 0 AND temperature <= 2);
+              ALTER TABLE ai_model_configs ADD CONSTRAINT chk_ai_model_limits CHECK (max_output_tokens > 0 AND timeout_seconds > 0);

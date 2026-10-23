@@ -1,0 +1,91 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 003-create-ai-generations
+      author: zodiakk
+
+      changes:
+        - createTable:
+            tableName: ai_generations
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: correlation_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: assessment_id
+                  type: UUID
+              - column:
+                  name: model_config_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: prompt_template_id
+                  type: UUID
+                  constraints:
+                    nullable: false
+              - column:
+                  name: task_type
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: VARCHAR(25)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: input_hash
+                  type: VARCHAR(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: idempotency_key
+                  type: VARCHAR(120)
+              - column:
+                  name: input_tokens
+                  type: INTEGER
+              - column:
+                  name: output_tokens
+                  type: INTEGER
+              - column:
+                  name: duration_ms
+                  type: INTEGER
+              - column:
+                  name: error_code
+                  type: VARCHAR(100)
+              - column:
+                  name: completed_at
+                  type: TIMESTAMP WITH TIME ZONE
+              - column:
+                  name: created_at
+                  type: TIMESTAMP WITH TIME ZONE
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: ai_generations
+            baseColumnNames: model_config_id
+            referencedTableName: ai_model_configs
+            referencedColumnNames: id
+            constraintName: fk_ai_generation_model_config
+
+        - addForeignKeyConstraint:
+            baseTableName: ai_generations
+            baseColumnNames: prompt_template_id
+            referencedTableName: prompt_templates
+            referencedColumnNames: id
+            constraintName: fk_ai_generation_prompt_template
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              ALTER TABLE ai_generations ADD CONSTRAINT chk_ai_generation_tokens CHECK ((input_tokens IS NULL OR input_tokens >= 0) AND (output_tokens IS NULL OR output_tokens >= 0) AND (duration_ms IS NULL OR duration_ms >= 0));

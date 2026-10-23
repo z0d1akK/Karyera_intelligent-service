@@ -1,0 +1,15 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 004-create-indexes
+      author: zodiakk
+
+      changes:
+        - sql:
+            dbms: postgresql
+            sql: |
+              CREATE UNIQUE INDEX uq_ai_generation_idempotency ON ai_generations (idempotency_key) WHERE idempotency_key IS NOT NULL;
+              CREATE INDEX idx_ai_generation_assessment ON ai_generations (assessment_id, created_at DESC);
+              CREATE INDEX idx_ai_generation_correlation ON ai_generations (correlation_id);
+              CREATE INDEX idx_ai_generation_status ON ai_generations (status, created_at);
+              CREATE INDEX idx_prompt_template_task_active ON prompt_templates (task_type, active);

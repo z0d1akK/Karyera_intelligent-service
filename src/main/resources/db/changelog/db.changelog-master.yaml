@@ -1,0 +1,13 @@
+databaseChangeLog:
+
+  - include:
+      file: db/changelog/tables/001-create-ai-model-configs.yaml
+
+  - include:
+      file: db/changelog/tables/002-create-prompt-templates.yaml
+
+  - include:
+      file: db/changelog/tables/003-create-ai-generations.yaml
+
+  - include:
+      file: db/changelog/tables/004-create-indexes.yaml
