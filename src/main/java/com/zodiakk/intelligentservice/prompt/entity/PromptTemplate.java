@@ -1,6 +1,7 @@
 package com.zodiakk.intelligentservice.prompt.entity;
 
 import com.zodiakk.intelligentservice.common.entity.CreatedEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;

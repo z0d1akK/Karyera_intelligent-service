@@ -1,7 +1,7 @@
 package com.zodiakk.intelligentservice.model.entity;
 
 import com.zodiakk.intelligentservice.common.entity.BaseEntity;
-import java.math.BigDecimal;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+
+import java.math.BigDecimal;
 
 @Getter
 @Setter
