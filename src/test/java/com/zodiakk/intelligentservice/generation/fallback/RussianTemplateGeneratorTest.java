@@ -87,6 +87,51 @@ class RussianTemplateGeneratorTest {
         assertTrue(response.getRecommendationRationale().contains("не прогнозируется"));
     }
 
+    @Test
+    void explainsScreeningWithoutAssigningPeople() {
+        var empty = generator.explainScreening(new com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto());
+        assertTrue(empty.getSummary().contains("0 кандидатов"));
+
+        var request = new com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto();
+        request.setTargetPositionName("Lead");
+        var candidate = new com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto.Candidate();
+        candidate.setEmployeeName("Иван");
+        request.setCandidates(List.of(candidate));
+        var named = generator.explainScreening(request);
+        assertTrue(named.getSummary().contains("Иван"));
+        assertEquals(RussianTemplateGenerator.MODEL_IDENTIFIER, named.getModelIdentifier());
+    }
+
+    @Test
+    void handlesNullScoresNamesAndDefaultPreferences() {
+        var explained = generator.explain(CareerExplanationRequestDto.builder()
+                .assessmentId(UUID.randomUUID())
+                .dataQualityStatus("COMPLETE")
+                .mandatoryRequirementsMet(true)
+                .scores(AssessmentScoresDto.builder().skill(null).experience(null).total(null).build())
+                .strengths(null)
+                .skillGaps(null)
+                .build());
+        assertTrue(explained.getSummary().contains("не рассчитано"));
+        assertTrue(explained.getStrengths().isEmpty());
+
+        var recommended = generator.recommend(DevelopmentRecommendationRequestDto.builder()
+                .assessmentId(UUID.randomUUID())
+                .developmentAreas(List.of(DevelopmentAreaContextDto.builder()
+                        .skillId(UUID.randomUUID())
+                        .skillName(null)
+                        .currentLevel(1)
+                        .targetLevel(2)
+                        .build()))
+                .build());
+        assertEquals(RecommendationType.PROJECT_EXPERIENCE, recommended.getRecommendations().getFirst().getType());
+
+        var unnamed = new com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto();
+        var candidate = new com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto.Candidate();
+        unnamed.setCandidates(List.of(candidate));
+        assertTrue(generator.explainScreening(unnamed).getSummary().contains("лидера рейтинга"));
+    }
+
     private CareerPathCandidateDto direction(UUID id, String name, String score, int gaps) {
         return CareerPathCandidateDto.builder()
                 .targetPositionId(id)
