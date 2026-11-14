@@ -1,0 +1,18 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 005-add-generation-output
+      author: zodiakk
+
+      changes:
+        - addColumn:
+            tableName: ai_generations
+            columns:
+              - column:
+                  name: output
+                  type: JSONB
+
+        - sql:
+            dbms: postgresql
+            sql: |
+              CREATE INDEX idx_ai_generation_input_hash ON ai_generations (task_type, input_hash, created_at DESC);

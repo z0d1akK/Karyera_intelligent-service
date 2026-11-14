@@ -13,6 +13,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import org.hibernate.annotations.ColumnTransformer;
+
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -60,6 +62,10 @@ public class AiGeneration extends CreatedEntity {
 
     @Column(name = "error_code", length = 100)
     private String errorCode;
+
+    @ColumnTransformer(write = "?::jsonb")
+    @Column(name = "output", columnDefinition = "jsonb")
+    private String output;
 
     @Column(name = "completed_at")
     private OffsetDateTime completedAt;

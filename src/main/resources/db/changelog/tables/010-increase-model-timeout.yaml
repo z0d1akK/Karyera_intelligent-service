@@ -1,0 +1,12 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 010-increase-model-timeout
+      author: zodiakk
+      changes:
+        - update:
+            tableName: ai_model_configs
+            where: active = true
+            columns:
+              - column: { name: timeout_seconds, valueNumeric: 180 }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }

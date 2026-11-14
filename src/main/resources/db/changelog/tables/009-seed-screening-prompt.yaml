@@ -1,0 +1,18 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 009-seed-screening-prompt
+      author: zodiakk
+      changes:
+        - insert:
+            tableName: prompt_templates
+            columns:
+              - column: { name: id, value: "22222222-2222-4222-8222-222222222204" }
+              - column: { name: code, value: talent-screening-explanation }
+              - column: { name: version, valueNumeric: 1 }
+              - column: { name: task_type, value: TALENT_SCREENING_EXPLANATION }
+              - column: { name: system_prompt, value: "Ты объясняешь уже рассчитанный рейтинг кадрового резерва. Не меняй баллы и не назначай людей в резерв. Верни только JSON." }
+              - column: { name: user_prompt_template, value: "Объясни рейтинг. Верни JSON с полями summary, highlights, limitations. Данные:\n{{input}}" }
+              - column: { name: output_schema_version, value: "1" }
+              - column: { name: active, valueBoolean: true }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }

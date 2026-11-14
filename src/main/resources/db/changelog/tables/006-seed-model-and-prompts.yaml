@@ -1,0 +1,59 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 006-seed-model-and-prompts
+      author: zodiakk
+
+      changes:
+        - insert:
+            tableName: ai_model_configs
+            columns:
+              - column: { name: id, value: "11111111-1111-4111-8111-111111111101" }
+              - column: { name: code, value: qwen25-14b }
+              - column: { name: provider, value: ollama }
+              - column: { name: model_name, value: "qwen2.5:14b" }
+              - column: { name: temperature, valueNumeric: 0.20 }
+              - column: { name: max_output_tokens, valueNumeric: 1200 }
+              - column: { name: timeout_seconds, valueNumeric: 30 }
+              - column: { name: active, valueBoolean: true }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }
+
+        - insert:
+            tableName: prompt_templates
+            columns:
+              - column: { name: id, value: "22222222-2222-4222-8222-222222222201" }
+              - column: { name: code, value: career-explanation }
+              - column: { name: version, valueNumeric: 1 }
+              - column: { name: task_type, value: CAREER_EXPLANATION }
+              - column: { name: system_prompt, value: "Ты объясняешь уже рассчитанную карьерную оценку. Не меняй баллы, не назначай грейд и не обещай повышение или сроки. Не выдумывай курсы и проекты. Верни только JSON." }
+              - column: { name: user_prompt_template, value: "Объясни оценку. Верни JSON с полями summary, strengths, developmentAreas, limitations. Данные:\n{{input}}" }
+              - column: { name: output_schema_version, value: "1" }
+              - column: { name: active, valueBoolean: true }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+
+        - insert:
+            tableName: prompt_templates
+            columns:
+              - column: { name: id, value: "22222222-2222-4222-8222-222222222202" }
+              - column: { name: code, value: development-recommendations }
+              - column: { name: version, valueNumeric: 1 }
+              - column: { name: task_type, value: DEVELOPMENT_RECOMMENDATIONS }
+              - column: { name: system_prompt, value: "Ты предлагаешь развитие навыков по уже выявленным дефицитам. Не обещай повышение и сроки. Не утверждай, что в компании есть конкретный курс или свободный проект. Верни только JSON." }
+              - column: { name: user_prompt_template, value: "Сформируй рекомендации. Верни JSON с полем recommendations. Данные:\n{{input}}" }
+              - column: { name: output_schema_version, value: "1" }
+              - column: { name: active, valueBoolean: true }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }
+
+        - insert:
+            tableName: prompt_templates
+            columns:
+              - column: { name: id, value: "22222222-2222-4222-8222-222222222203" }
+              - column: { name: code, value: career-path-interpretation }
+              - column: { name: version, valueNumeric: 1 }
+              - column: { name: task_type, value: CAREER_PATH_INTERPRETATION }
+              - column: { name: system_prompt, value: "Ты сравниваешь уже разрешённые карьерные направления. Не добавляй новые должности и не обещай сроки перехода. Верни только JSON." }
+              - column: { name: user_prompt_template, value: "Сравни направления. Верни JSON с полями summary, directions, recommendedDirection, recommendationRationale, limitations. Данные:\n{{input}}" }
+              - column: { name: output_schema_version, value: "1" }
+              - column: { name: active, valueBoolean: true }
+              - column: { name: created_at, valueComputed: CURRENT_TIMESTAMP }

@@ -1,0 +1,14 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 007-activate-qwen25-7b
+      author: zodiakk
+      changes:
+        - update:
+            tableName: ai_model_configs
+            where: code = 'qwen25-14b'
+            columns:
+              - column: { name: code, value: qwen25-7b }
+              - column: { name: model_name, value: "qwen2.5:7b" }
+              - column: { name: timeout_seconds, valueNumeric: 45 }
+              - column: { name: updated_at, valueComputed: CURRENT_TIMESTAMP }

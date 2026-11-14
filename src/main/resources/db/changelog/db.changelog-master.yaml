@@ -11,3 +11,24 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/tables/004-create-indexes.yaml
+
+  - include:
+      file: db/changelog/tables/005-add-generation-output.yaml
+
+  - include:
+      file: db/changelog/tables/006-seed-model-and-prompts.yaml
+
+  - include:
+      file: db/changelog/tables/007-activate-qwen25-7b.yaml
+
+  - include:
+      file: db/changelog/tables/008-activate-qwen25-3b.yaml
+
+  - include:
+      file: db/changelog/tables/009-seed-screening-prompt.yaml
+
+  - include:
+      file: db/changelog/tables/010-increase-model-timeout.yaml
+
+  - include:
+      file: db/changelog/tables/011-structured-json-prompts.yaml

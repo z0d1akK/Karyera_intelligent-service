@@ -1,0 +1,19 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 011-structured-json-prompts
+      author: zodiakk
+      changes:
+        - update:
+            tableName: prompt_templates
+            where: code = 'career-explanation' and active = true
+            columns:
+              - column: { name: version, valueNumeric: 2 }
+              - column: { name: user_prompt_template, value: "Объясни оценку. Верни только JSON вида {\"summary\":\"строка\",\"strengths\":[\"строка\"],\"developmentAreas\":[{\"skillId\":\"uuid\",\"explanation\":\"строка\"}],\"limitations\":[\"строка\"]}. strengths — массив строк. developmentAreas — массив объектов с skillId и explanation. Данные:\n{{input}}" }
+
+        - update:
+            tableName: prompt_templates
+            where: code = 'development-recommendations' and active = true
+            columns:
+              - column: { name: version, valueNumeric: 2 }
+              - column: { name: user_prompt_template, value: "Сформируй рекомендации. Верни только JSON вида {\"recommendations\":[{\"skillId\":\"uuid\",\"type\":\"SELF_STUDY\",\"title\":\"строка\",\"description\":\"строка\",\"suggestedActivities\":[\"строка\"],\"expectedOutcome\":\"строка\"}]}. type один из SELF_STUDY, PROJECT_EXPERIENCE, MENTORING, TRAINING. title и description обязательны. Данные:\n{{input}}" }
