@@ -78,7 +78,7 @@ class IntelligenceFlowIntegrationTest {
                                 {"assessmentId":"%s","language":"ru","targetPositionName":"Senior","developmentAreas":[{"skillId":"%s","skillName":"Kafka","currentLevel":1,"targetLevel":3,"priorityScore":0.1}],"preferences":{"maxRecommendations":5,"includeProjectActivities":true,"includeMentoring":true}}
                                 """.formatted(UUID.randomUUID(), UUID.randomUUID())))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.recommendations[0].title").value("Развитие навыка Kafka"));
+                .andExpect(jsonPath("$.recommendations[0].title").value("Подтянуть Kafka с 1 до 3"));
 
         mockMvc.perform(post("/internal/v1/intelligence/career-path-interpretations")
                         .header("X-Internal-Key", "test-internal-api-key")

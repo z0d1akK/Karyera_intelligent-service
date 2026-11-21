@@ -44,7 +44,7 @@ class RussianTemplateGeneratorTest {
 
         assertTrue(response.getSummary().contains("22.5%"));
         assertTrue(response.getSummary().contains("Senior"));
-        assertTrue(response.getSummary().contains("выполнены не все"));
+        assertTrue(response.getSummary().contains("обязательные требования"));
         assertEquals(skillId, response.getDevelopmentAreas().getFirst().getSkillId());
         assertTrue(response.getLimitations().size() >= 2);
         assertEquals(RussianTemplateGenerator.MODEL_IDENTIFIER, response.getModelIdentifier());

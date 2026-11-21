@@ -28,21 +28,27 @@ public class RussianTemplateGenerator {
     public static final String MODEL_IDENTIFIER = "template-fallback";
 
     public CareerExplanationResponseDto explain(CareerExplanationRequestDto request) {
+        String position = request.getTarget() == null ? "целевой должности" : name(request.getTarget().getPositionName());
         List<String> strengths = new ArrayList<>();
         if (request.getStrengths() != null) {
             for (SkillStrengthDto strength : request.getStrengths()) {
-                strengths.add("Уровень " + name(strength.getSkillName()) + " соответствует требованиям: "
-                        + strength.getActualLevel() + " из " + strength.getRequiredLevel() + ".");
+                strengths.add(name(strength.getSkillName()) + " уже на уровне "
+                        + strength.getActualLevel() + " из " + strength.getRequiredLevel()
+                        + " — это опора для перехода на " + position + ".");
             }
         }
 
         List<DevelopmentAreaExplanationDto> areas = new ArrayList<>();
         if (request.getSkillGaps() != null) {
             for (SkillGapContextDto gap : request.getSkillGaps()) {
+                int actual = gap.getActualLevel() == null ? 0 : gap.getActualLevel();
+                int required = gap.getRequiredLevel() == null ? 0 : gap.getRequiredLevel();
                 areas.add(DevelopmentAreaExplanationDto.builder()
                         .skillId(gap.getSkillId())
-                        .explanation("Текущий уровень " + name(gap.getSkillName()) + " равен " + gap.getActualLevel()
-                                + ", требуется " + gap.getRequiredLevel() + ". Это не меняет рассчитанный балл.")
+                        .explanation("Для " + position + " по навыку " + name(gap.getSkillName())
+                                + " сейчас " + actual + " из " + required
+                                + " (разрыв " + Math.max(required - actual, 0)
+                                + "). Следующий шаг — взять рабочую задачу, где этот навык основной, и довести её до результата, который можно показать руководителю.")
                         .build());
             }
         }
@@ -53,13 +59,13 @@ public class RussianTemplateGenerator {
             limitations.add("Часть исходных данных была неполной, поэтому объяснение ограничено доступными баллами.");
         }
 
-        String position = request.getTarget() == null ? "цели" : name(request.getTarget().getPositionName());
         return CareerExplanationResponseDto.builder()
                 .assessmentId(request.getAssessmentId())
-                .summary("Итоговое соответствие " + position + " составляет " + percent(request.getScores().getTotal())
-                        + ". Соответствие навыков " + percent(request.getScores().getSkill())
-                        + ". Обязательные требования "
-                        + (Boolean.TRUE.equals(request.getMandatoryRequirementsMet()) ? "выполнены." : "выполнены не все."))
+                .summary("Сотрудник соответствует " + position + " на " + percent(request.getScores().getTotal())
+                        + ". По навыкам " + percent(request.getScores().getSkill())
+                        + ". " + (Boolean.TRUE.equals(request.getMandatoryRequirementsMet())
+                        ? "Обязательные требования закрыты, дальше имеет смысл усиливать оставшиеся разрывы."
+                        : "Сначала закройте обязательные требования, затем подтягивайте остальные навыки."))
                 .strengths(strengths)
                 .developmentAreas(areas)
                 .limitations(limitations)
@@ -86,15 +92,16 @@ public class RussianTemplateGenerator {
             recommendations.add(DevelopmentRecommendationDto.builder()
                     .skillId(area.getSkillId())
                     .type(type)
-                    .title("Развитие навыка " + area.getSkillName())
-                    .description("Рекомендация относится к навыку " + area.getSkillName()
-                            + ": текущий уровень " + area.getCurrentLevel() + ", целевой " + area.getTargetLevel()
-                            + ". Конкретный курс или свободный проект не указаны, потому что таких данных нет.")
+                    .title("Подтянуть " + area.getSkillName() + " с " + area.getCurrentLevel() + " до " + area.getTargetLevel())
+                    .description("Разрыв по навыку " + area.getSkillName() + " составляет "
+                            + Math.max((area.getTargetLevel() == null ? 0 : area.getTargetLevel())
+                            - (area.getCurrentLevel() == null ? 0 : area.getCurrentLevel()), 0)
+                            + ". В ближайшие недели возьмите задачу, где этот навык главный, разберите рабочий пример и покажите результат руководителю.")
                     .suggestedActivities(List.of(
-                            "Разобрать практический пример по навыку " + area.getSkillName() + ".",
-                            "Закрепить результат на задаче, связанной с этим навыком."
+                            "Выбрать одну боевую задачу по навыку " + area.getSkillName() + " и довести её до ревью.",
+                            "Зафиксировать, что изменилось в результате: качество, скорость или самостоятельность."
                     ))
-                    .expectedOutcome("Практическое понимание навыка " + area.getSkillName() + " без обещания срока повышения.")
+                    .expectedOutcome("Сдвиг по навыку " + area.getSkillName() + " виден на конкретной задаче, а не только в самооценке.")
                     .build());
             index++;
         }

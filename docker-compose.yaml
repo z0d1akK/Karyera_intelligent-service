@@ -9,9 +9,6 @@ services:
     container_name: intelligent-service
     restart: unless-stopped
 
-    ports:
-      - "${SERVER_PORT}:${SERVER_PORT}"
-
     environment:
       SPRING_PROFILES_ACTIVE: docker
       ACTIVE_PROFILE: docker

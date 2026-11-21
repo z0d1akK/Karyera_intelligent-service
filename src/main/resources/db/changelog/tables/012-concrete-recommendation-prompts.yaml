@@ -1,0 +1,19 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 012-concrete-recommendation-prompts
+      author: zodiakk
+      changes:
+        - update:
+            tableName: prompt_templates
+            where: code = 'career-explanation' and active = true
+            columns:
+              - column: { name: version, valueNumeric: 3 }
+              - column: { name: user_prompt_template, value: "Напиши объяснение оценки для сотрудника и целевой должности живым профессиональным языком на русском. Назови сотрудника, должность, итоговый процент, 1-2 сильные стороны и для каждого дефицита: текущий уровень, требуемый, разрыв и один конкретный следующий шаг. Не выдумывай курсы, которых нет во входных данных. Верни только JSON вида {\"summary\":\"строка\",\"strengths\":[\"строка\"],\"developmentAreas\":[{\"skillId\":\"uuid\",\"explanation\":\"строка\"}],\"limitations\":[\"строка\"]}. Данные:\n{{input}}" }
+
+        - update:
+            tableName: prompt_templates
+            where: code = 'development-recommendations' and active = true
+            columns:
+              - column: { name: version, valueNumeric: 3 }
+              - column: { name: user_prompt_template, value: "Сформируй рекомендации по развитию. Для каждого навыка укажи разрыв уровней, что сделать на ближайшие 2-4 недели, на каком рабочем материале и какой результат считать сдвигом. Пиши конкретно, без канцелярита. type один из SELF_STUDY, PROJECT_EXPERIENCE, MENTORING, TRAINING. Верни только JSON вида {\"recommendations\":[{\"skillId\":\"uuid\",\"type\":\"SELF_STUDY\",\"title\":\"строка\",\"description\":\"строка\",\"suggestedActivities\":[\"строка\"],\"expectedOutcome\":\"строка\"}]}. Данные:\n{{input}}" }
