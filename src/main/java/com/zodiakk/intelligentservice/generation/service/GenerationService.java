@@ -16,6 +16,8 @@ import com.zodiakk.intelligentservice.model.entity.AiModelConfig;
 import com.zodiakk.intelligentservice.model.repository.AiModelConfigRepository;
 import com.zodiakk.intelligentservice.prompt.entity.PromptTemplate;
 import com.zodiakk.intelligentservice.prompt.repository.PromptTemplateRepository;
+import com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto;
+import com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.Cache;
@@ -31,6 +33,7 @@ import java.security.NoSuchAlgorithmException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.HexFormat;
+import java.util.Set;
 import java.util.UUID;
 
 @Slf4j
@@ -81,15 +84,13 @@ public class GenerationService {
     }
 
     @Transactional
-    public com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationResponseDto explainScreening(
-            com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationRequestDto request
-    ) {
+    public TalentScreeningExplanationResponseDto explainScreening(TalentScreeningExplanationRequestDto request) {
         return generate(
                 TALENT_SCREENING_EXPLANATION,
                 null,
                 request.getCorrelationId(),
                 request,
-                com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationResponseDto.class,
+                TalentScreeningExplanationResponseDto.class,
                 () -> templates.explainScreening(request)
         );
     }
@@ -110,7 +111,7 @@ public class GenerationService {
     ) {
         String hash = sha256(taskType + ":" + write(request));
         T cached = readCache(taskType, hash, type);
-        if (valid(cached)) {
+        if (valid(cached, request)) {
             return cached;
         }
 
@@ -119,7 +120,7 @@ public class GenerationService {
                 .orElse(null);
         if (existing != null && existing.getOutput() != null) {
             T restored = read(existing.getOutput(), type);
-            if (valid(restored)) {
+            if (valid(restored, request)) {
                 writeCache(taskType, hash, existing.getOutput());
                 return restored;
             }
@@ -146,7 +147,7 @@ public class GenerationService {
             result = null;
         }
 
-        if (!valid(result)) {
+        if (!valid(result, request)) {
             log.warn("LLM output rejected for task {}, using template. Raw: {}", taskType, abbreviate(raw));
             try {
                 result = fallback.get();
@@ -192,17 +193,39 @@ public class GenerationService {
         return result;
     }
 
-    private boolean valid(Object result) {
+    private boolean valid(Object result, Object request) {
         if (result instanceof CareerExplanationResponseDto explanation) {
-            return explanation.getSummary() != null && !explanation.getSummary().isBlank()
+            boolean shape = explanation.getSummary() != null && !explanation.getSummary().isBlank()
                     && explanation.getStrengths() != null
                     && explanation.getDevelopmentAreas() != null
                     && explanation.getLimitations() != null;
+            if (!shape || !(request instanceof CareerExplanationRequestDto input)) {
+                return shape;
+            }
+            Set<UUID> covered = explanation.getDevelopmentAreas().stream()
+                    .map(area -> area.getSkillId())
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+            return input.getSkillGaps() == null || input.getSkillGaps().stream()
+                    .map(gap -> gap.getSkillId())
+                    .filter(java.util.Objects::nonNull)
+                    .allMatch(covered::contains);
         }
         if (result instanceof DevelopmentRecommendationResponseDto recommendations) {
-            return recommendations.getRecommendations() != null
+            boolean shape = recommendations.getRecommendations() != null
                     && recommendations.getRecommendations().stream().anyMatch(item ->
                     notBlank(item.getTitle()) || notBlank(item.getDescription()));
+            if (!shape || !(request instanceof DevelopmentRecommendationRequestDto input)) {
+                return shape;
+            }
+            Set<java.util.UUID> covered = recommendations.getRecommendations().stream()
+                    .map(item -> item.getSkillId())
+                    .filter(java.util.Objects::nonNull)
+                    .collect(java.util.stream.Collectors.toSet());
+            return input.getDevelopmentAreas() == null || input.getDevelopmentAreas().stream()
+                    .map(area -> area.getSkillId())
+                    .filter(java.util.Objects::nonNull)
+                    .allMatch(covered::contains);
         }
         if (result instanceof CareerPathInterpretationResponseDto interpretation) {
             return interpretation.getSummary() != null && !interpretation.getSummary().isBlank()
@@ -224,7 +247,7 @@ public class GenerationService {
             interpretation.setModelIdentifier(modelIdentifier);
             interpretation.setPromptVersion(promptVersion);
         }
-        if (result instanceof com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationResponseDto screening) {
+        if (result instanceof TalentScreeningExplanationResponseDto screening) {
             screening.setModelIdentifier(modelIdentifier);
             screening.setStatus(status.name());
         }
@@ -243,7 +266,7 @@ public class GenerationService {
         if (result instanceof CareerPathInterpretationResponseDto interpretation) {
             interpretation.setGenerationId(id);
         }
-        if (result instanceof com.zodiakk.intelligentservice.screening.dto.TalentScreeningExplanationResponseDto screening) {
+        if (result instanceof TalentScreeningExplanationResponseDto screening) {
             screening.setGenerationId(id);
         }
     }
