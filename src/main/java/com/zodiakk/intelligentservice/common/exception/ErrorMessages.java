@@ -1,0 +1,27 @@
+package com.zodiakk.intelligentservice.common.exception;
+
+import lombok.experimental.UtilityClass;
+
+@UtilityClass
+public class ErrorMessages {
+
+    public static final String INTERNAL_SERVER_ERROR = "Внутренняя ошибка сервера. Попробуйте позднее.";
+
+    public static final String DATA_INTEGRITY_VIOLATION = "Нарушено ограничение целостности данных";
+
+    public static final String INVALID_REQUEST_BODY = "Некорректное тело запроса";
+
+    public static final String INVALID_PARAMETER = "Некорректное значение параметра: %s";
+
+    public static final String MISSING_PARAMETER = "Обязательный параметр отсутствует: %s";
+
+    public static final String UNSUPPORTED_MEDIA_TYPE = "Неподдерживаемый тип содержимого запроса";
+
+    public static final String ACCESS_DENIED = "Доступ запрещён";
+
+    public static final String UNAUTHORIZED = "Требуется аутентификация";
+
+    public static final String METHOD_NOT_ALLOWED = "Метод не поддерживается";
+
+    public static final String RESOURCE_NOT_FOUND = "Ресурс не найден";
+}

@@ -65,25 +65,21 @@ public class GenerationService {
 
     private final CacheManager cacheManager;
 
-    @Transactional
     public CareerExplanationResponseDto explain(CareerExplanationRequestDto request) {
         return generate(CAREER_EXPLANATION, request.getAssessmentId(), request.getCorrelationId(), request,
                 CareerExplanationResponseDto.class, () -> templates.explain(request));
     }
 
-    @Transactional
     public DevelopmentRecommendationResponseDto recommend(DevelopmentRecommendationRequestDto request) {
         return generate(DEVELOPMENT_RECOMMENDATIONS, request.getAssessmentId(), request.getCorrelationId(), request,
                 DevelopmentRecommendationResponseDto.class, () -> templates.recommend(request));
     }
 
-    @Transactional
     public CareerPathInterpretationResponseDto interpret(CareerPathInterpretationRequestDto request) {
         return generate(CAREER_PATH_INTERPRETATION, null, request.getCorrelationId(), request,
                 CareerPathInterpretationResponseDto.class, () -> templates.interpret(request));
     }
 
-    @Transactional
     public TalentScreeningExplanationResponseDto explainScreening(TalentScreeningExplanationRequestDto request) {
         return generate(
                 TALENT_SCREENING_EXPLANATION,

@@ -91,7 +91,7 @@ class GenerationServiceTest {
 
         var response = service.explain(request());
 
-        assertEquals("qwen2.5:14b", response.getModelIdentifier());
+        assertEquals("qwen2.5:3b", response.getModelIdentifier());
         assertEquals(1, response.getPromptVersion());
         verify(generationRepository).save(any());
     }
@@ -100,7 +100,7 @@ class GenerationServiceTest {
     void returnsTheStoredGenerationForTheSameInput() {
         AiGeneration stored = AiGeneration.builder()
                 .id(UUID.randomUUID())
-                .output("{\"summary\":\"Сохранено\",\"strengths\":[],\"developmentAreas\":[],\"limitations\":[],\"modelIdentifier\":\"qwen2.5:14b\"}")
+                .output("{\"summary\":\"Сохранено\",\"strengths\":[],\"developmentAreas\":[],\"limitations\":[],\"modelIdentifier\":\"qwen2.5:3b\"}")
                 .status(AiGenerationStatus.COMPLETED)
                 .build();
         when(generationRepository.findFirstByTaskTypeAndInputHashAndStatusOrderByCreatedAtDesc(any(), any(), any()))
@@ -254,7 +254,7 @@ class GenerationServiceTest {
     }
 
     private AiModelConfig model() {
-        return AiModelConfig.builder().id(UUID.randomUUID()).modelName("qwen2.5:14b").active(true).build();
+        return AiModelConfig.builder().id(UUID.randomUUID()).modelName("qwen2.5:3b").active(true).build();
     }
 
     private PromptTemplate prompt() {

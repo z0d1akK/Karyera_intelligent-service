@@ -19,30 +19,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http,
-            @Value("${internal.api-key}") String internalApiKey
+            @Value("${internal.api-key}") String internalApiKey,
+            @Value("${app.openapi.anonymous:false}") boolean openApiAnonymous
     ) throws Exception {
         CustomAuthenticationEntryPoint entryPoint = new CustomAuthenticationEntryPoint();
 
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(
-                                "/actuator/health",
-                                "/actuator/health/**",
-                                "/actuator/info",
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll();
+                    auth.requestMatchers(
+                            "/actuator/health",
+                            "/actuator/health/**",
+                            "/actuator/info",
+                            "/error"
+                    ).permitAll();
+                    if (openApiAnonymous) {
+                        auth.requestMatchers(
                                 "/api-docs",
                                 "/api-docs/**",
                                 "/v3/api-docs",
                                 "/v3/api-docs/**",
                                 "/swagger-ui",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/error"
-                        ).permitAll()
-                        .requestMatchers("/internal/**").hasAuthority(SecurityConstants.INTERNAL_SERVICE_AUTHORITY)
-                        .anyRequest().denyAll())
+                                "/swagger-ui.html"
+                        ).permitAll();
+                    }
+                    auth.requestMatchers("/internal/**").hasAuthority(SecurityConstants.INTERNAL_SERVICE_AUTHORITY);
+                    auth.anyRequest().denyAll();
+                })
                 .exceptionHandling(ex -> ex.authenticationEntryPoint(entryPoint))
                 .addFilterBefore(new InternalApiKeyFilter(internalApiKey, entryPoint), UsernamePasswordAuthenticationFilter.class)
                 .build();
